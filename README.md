@@ -1,10 +1,13 @@
 ![java-version](https://img.shields.io/badge/Java-11-brightgreen?style=flat-square)
+[![spring-boot-version](https://img.shields.io/badge/spring--boot-2.7+-brightgreen?style=flat-square)](https://github.com/spring-projects/spring-boot/releases)
 [![jitpack-last-release](https://jitpack.io/v/spacious-team/table-wrapper-spring-boot-starter.svg?style=flat-square)](
 https://jitpack.io/#spacious-team/table-wrapper-api)
 
 ### Назначение
 Позволяет работать с табличным представлением данных в форматах Excel, Xml и Csv через единый интерфейс
 [Table Wrapper API](https://github.com/spacious-team/table-wrapper-api).
+
+Совместим с проектами Spring Boot 2.7 и выше.
 
 Spring Boot Starter настраивает реализации фабрик `ExcelTableFactory`, `XmlTableFactory`, `CsvTableFactory`
 и подключает необходимые зависимости
