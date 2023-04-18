@@ -5,4 +5,4 @@
 #  - source install-jdk.sh --feature 15
 #  - jshell --version
 jdk:
-  - openjdk11
+  - openjdk17
