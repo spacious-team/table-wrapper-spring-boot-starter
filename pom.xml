@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.spacious-team</groupId>
+    <artifactId>table-wrapper-spring-boot-starter</artifactId>
+    <version>2023.1</version>
+    <packaging>jar</packaging>
+
+    <name>Spring Boot Starter for Table Wrapper</name>
+    <description>
+        Spring Boot starter with autoconfiguration and impl dependencies for Table Wrapper API
+    </description>
+    <url>https://github.com/spacious-team/table-wrapper-spring-boot-starter</url>
+
+    <licenses>
+        <license>
+            <name>GNU Affero GPLv3</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/spacious-team/table-wrapper-csv-impl</url>
+    </scm>
+
+    <properties>
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring-boot.version>2.7.10</spring-boot.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.spacious-team</groupId>
+                <artifactId>table-wrapper-api</artifactId>
+                <version>2023.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.spacious-team</groupId>
+            <artifactId>table-wrapper-excel-impl</artifactId>
+            <version>2023.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spacious-team</groupId>
+            <artifactId>table-wrapper-xml-impl</artifactId>
+            <version>2023.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spacious-team</groupId>
+            <artifactId>table-wrapper-csv-impl</artifactId>
+            <version>2023.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure-processor</artifactId>
+            <version>${spring-boot.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.2</version> <!-- JUnit 5 requirement -->
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
