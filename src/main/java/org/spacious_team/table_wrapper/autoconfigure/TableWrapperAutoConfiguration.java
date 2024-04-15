@@ -73,4 +73,15 @@ public class TableWrapperAutoConfiguration {
             return factory;
         }
     }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(ReportPageFactory.class)
+    public static class TableWrapperConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ReportPageFactory tableFactories() {
+            return new ReportPageFactory();
+        }
+    }
 }
