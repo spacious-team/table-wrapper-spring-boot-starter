@@ -67,7 +67,7 @@ Spring Boot Starter настраивает реализации фабрик `Ex
 - короткий десяти значный номер коммита для сборки зависимости с указанного коммита.
 
 ### Пример использования
-Определяются колонки таблицы вне зависимости от формата файла (excel, xml, csv и др.):
+Определяются колонки таблицы:
 ```java
 @lombok.Getter
 @lombok.RequiredArgsConstructor
@@ -78,26 +78,51 @@ enum TableHeader implements TableHeaderColumn {
     private final TableColumn column;
 }
 ```
-Извлекаем данные в описанном формате, например, из Excel файла через Stream API
+Извлекаем данные из таблицы с указанными колонками вне зависимости от формата файла (excel, xml, csv и др.):
 ```java
 @org.springframework.beans.factory.annotation.Autowired
 ReportPageFactory reportPageFactory;
 
-Workbook book = new XSSFWorkbook(xlsFileinputStream);  // открываем Excel файл
-Sheet sheet = book.getSheetAt(0);                      // используем 1-ый лист Excel файла для поиска таблицы
+void parse() {
+    // Получаем страницу с данными
+    Object page = getFromExcel("1.xlsx");
+    // ... или page = getFromXml("1.xml");
+    // ... или page = getFromCsv("1.csv");
 
-// Используем бин ReportPageFactory для построения абстракции над листом Excel файла
-ReportPage reportPage = reportPageFactory.create(sheet);
+    // Используем бин ReportPageFactory для построения абстракции
+    ReportPage reportPage = reportPageFactory.create(page);
 
-// Метод найдет ячейку с текстом "Таблица 1",
-// воспринимает следующую за ней строку как заголовок таблицы,
-// из последующих строк (до пустой строки или конца файла) извлекаются данные
-Table table = reportPage.create("Таблица 1", TableHeader.class);  // метод использует бин ExcelTableFactory для создания таблицы
+    // Метод найдет ячейку с текстом "Таблица 1",
+    // воспринимает следующую за ней строку как заголовок таблицы,
+    // из последующих строк (до пустой строки или конца файла) извлекаются данные
+    Table table = reportPage.create("Таблица 1", TableHeader.class);  // метод использует бин ExcelTableFactory для создания таблицы
 
-// Извлекаем и обрабатываем строки таблицы
-table.stream()
-        .forEach(row -> {
-            String product = row.getStringCellValue(TableHeader.PRODUCT);
-            BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
-        });
+    // Извлекаем и обрабатываем данные из строк таблицы
+    table.stream()
+            .forEach(row -> {
+                String product = row.getStringCellValue(TableHeader.PRODUCT);
+                BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
+            });
+}
+```
+Пример реализации методов для чтения файлов форматов excel, xml, csv:
+```java
+Sheet getFromExcel(String fileName) {
+    Path path = Paths.get(fileName);
+    try (InputStream is = Files.newInputStream(path)) {
+        Workbook book = new XSSFWorkbook(is);  // открываем Excel файл
+        Sheet sheet = book.getSheetAt(0);      // используем 1-ый лист Excel файла для поиска таблицы
+    }
+}
+
+Workbook getFromXml(String fileName) {
+    ExcelReader reader = new ExcelReader();
+    return reader.getWorkbook(fileName);       // открываем Excel таблицу из .xml файла 
+}
+
+String[][] getFromCsv(String fileName) {
+    File file = new File(fileName);
+    CsvParser parser = new CsvParser(new CsvParserSettings());
+    return parser.parseAll(file).toArray(new String[0][]);     // открываем таблицу из .csv файла 
+}
 ```

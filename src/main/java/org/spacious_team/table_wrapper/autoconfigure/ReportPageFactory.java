@@ -39,4 +39,6 @@ public class ReportPageFactory {
         }
         throw new IllegalArgumentException("Unexpected type: " + page.getClass());
     }
+
+    // TODO add "public ReportPage create(Path path)" method and choose ReportPage impl by file name extension
 }
