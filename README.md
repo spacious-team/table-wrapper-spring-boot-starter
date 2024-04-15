@@ -81,7 +81,7 @@ enum TableHeader implements TableHeaderColumn {
 Извлекаем данные в описанном формате, например, из Excel файла через Stream API
 ```java
 @org.springframework.beans.factory.annotation.Autowired
-ReportPageFactory reportPageFactory;        
+ReportPageFactory reportPageFactory;
 
 Workbook book = new XSSFWorkbook(xlsFileinputStream);  // открываем Excel файл
 Sheet sheet = book.getSheetAt(0);                      // используем 1-ый лист Excel файла для поиска таблицы
