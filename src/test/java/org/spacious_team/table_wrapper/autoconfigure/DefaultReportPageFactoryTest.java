@@ -18,32 +18,38 @@
 
 package org.spacious_team.table_wrapper.autoconfigure;
 
-import lombok.SneakyThrows;
+import nl.fountain.xelem.excel.Worksheet;
+import nl.fountain.xelem.excel.ss.XLWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.spacious_team.table_wrapper.api.ReportPage;
+import org.spacious_team.table_wrapper.csv.CsvReportPage;
+import org.spacious_team.table_wrapper.excel.ExcelSheet;
+import org.spacious_team.table_wrapper.xml.XmlReportPage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.spacious_team.table_wrapper.autoconfigure.DefaultReportPageFactoryTestFileCreator.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactoryTestFileCreator.*;
 
+@SpringBootTest(classes = TableWrapperAutoConfiguration.class)
 public class DefaultReportPageFactoryTest {
 
-    DefaultReportPageFactory factory = new DefaultReportPageFactory();
+    @Autowired
+    DefaultReportPageFactory factory;
 
     @BeforeAll
     static void beforeTests() {
-        creteFiles();
+        createRoot();
     }
 
     @AfterAll
@@ -51,97 +57,98 @@ public class DefaultReportPageFactoryTest {
         deleteFiles();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"test.xls", "test.xlsx", "test.xml", "test.csv"})
-    void create_firstSheetByPath_ok(String fileName) {
-        Path path = getPath(fileName);
-        assertNotNull(factory.create(path));
-        assertNotNull(factory.create(path, 0));
-        assertNotNull(factory.create(path, sheetName));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.xls", "test.xlsx", "test.xml", "test.csv", "test.txt"})
-    void create_firstSheetByInputStream_ok(String fileName) {
-        InputStream is = getInputStream(fileName);
-        assertNotNull(factory.create(is));
-        assertNotNull(factory.create(is, 0));
-        assertNotNull(factory.create(is, sheetName));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.txt", "test.bin"})
-    void create_firstSheetByPath_exception(String fileName) {
-        Path path = getPath(fileName);
-        assertThrows(ReportPageInstantiationException.class, () -> factory.create(path));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.bin"})
-    void create_firstSheetByInputStream_exception(String fileName) {
-        InputStream is = getInputStream(fileName);
-        assertThrows(ReportPageInstantiationException.class, () -> factory.create(is));
-    }
-
-    // Test second sheet by index
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.xls", "test.xlsx", "test.xml", "test.txt", "test.bin"})
-    void create_secondSheetByPath_exception(String fileName) {
-        Path path = getPath(fileName);
-        assertThrows(ReportPageInstantiationException.class, () -> factory.create(path, 1));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.csv"})
-    void create_secondSheetForCsvByPath_ok(String fileName) {
-        Path path = getPath(fileName);
-        assertNotNull(factory.create(path, 1));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.csv", "test.txt"})
-    void create_secondSheetForCsvByInputStream_ok(String fileName) {
-        InputStream is = getInputStream(fileName);
-        assertNotNull(factory.create(is, 1));
-    }
-
-    // Test sheet by name
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.xls", "test.xlsx", "test.xml", "test.txt", "test.bin"})
-    void create_namedSheetByPath_exception(String fileName) {
-        Path path = getPath(fileName);
-        assertThrows(ReportPageInstantiationException.class, () -> factory.create(path, "SheetB"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.csv"})
-    void create_namedSheetForCsvByPath_ok(String fileName) {
-        Path path = getPath(fileName);
-        assertNotNull(factory.create(path, "SheetB"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"test.csv", "test.txt"})
-    void create_namedSheetForCsvByInputStream_ok(String fileName) {
-        InputStream is = getInputStream(fileName);
-        assertNotNull(factory.create(is, "SheetB"));
-    }
-
-    // Tests by constructor args
-
     @Test
-    void create_excel_ok() throws IOException {
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet();
-            assertNotNull(factory.create(sheet));
+    void create_excelSheet_ok() throws IOException {
+        for (Workbook workbook : List.of(new HSSFWorkbook(), new XSSFWorkbook())) {
+            try (workbook) {
+                Sheet sheet1 = workbook.createSheet();
+                Sheet sheet2 = workbook.createSheet();
+
+                ReportPage reportPage1 = factory.create(sheet1);
+                ReportPage reportPage2 = factory.create(sheet2);
+
+                assertNotSame(reportPage1, reportPage2);
+                assertSame(ExcelSheet.class, reportPage1.getClass());
+                assertSame(ExcelSheet.class, reportPage2.getClass());
+            }
         }
     }
 
-    @SneakyThrows
-    InputStream getInputStream(String fileName) {
-        Path path = getPath(fileName);
-        return Files.newInputStream(path);
+    @Test
+    void create_xmlReportPage_ok() {
+        XLWorkbook workbook = new XLWorkbook();
+        Worksheet worksheet1 = workbook.addSheet();
+        Worksheet worksheet2 = workbook.addSheet();
+
+        ReportPage reportPage1 = factory.create(worksheet1);
+        ReportPage reportPage2 = factory.create(worksheet2);
+
+        assertNotSame(reportPage1, reportPage2);
+        assertSame(XmlReportPage.class, reportPage1.getClass());
+        assertSame(XmlReportPage.class, reportPage2.getClass());
+    }
+
+    @Test
+    void create_csvReportPageFromArray_ok() {
+        Object table1 = new String[][]{{"a"}, {"1"}};
+        Object table2 = new String[][]{{"a"}, {"1"}};
+
+        ReportPage reportPage1 = factory.create(table1);
+        ReportPage reportPage2 = factory.create(table2);
+
+        assertNotSame(reportPage1, reportPage2);
+        assertSame(CsvReportPage.class, reportPage1.getClass());
+        assertSame(CsvReportPage.class, reportPage2.getClass());
+    }
+
+    @Test
+    void create_csvReportPageFromPath_ok() throws IOException {
+        createCsvFile("file1.any");
+        createCsvFile("file2.any");
+        Object path1 = getPath("file1.any");
+        Object path2 = getPath("file2.any");
+
+        ReportPage reportPage1 = factory.create(path1);
+        ReportPage reportPage2 = factory.create(path2);
+
+        assertNotSame(reportPage1, reportPage2);
+        assertSame(CsvReportPage.class, reportPage1.getClass());
+        assertSame(CsvReportPage.class, reportPage2.getClass());
+    }
+
+    @Test
+    void create_csvReportPageFromInputStream_ok() throws IOException {
+        createCsvFile("file1");
+        createCsvFile("file2");
+        Object is1 = getInputStream("file1");
+        Object is2 = getInputStream("file2");
+
+        ReportPage reportPage1 = factory.create(is1);
+        ReportPage reportPage2 = factory.create(is2);
+
+        assertNotSame(reportPage1, reportPage2);
+        assertSame(CsvReportPage.class, reportPage1.getClass());
+        assertSame(CsvReportPage.class, reportPage2.getClass());
+    }
+
+    @Test
+    void create_csvReportPageFromInputStreamAndSettings_ok() throws IOException {
+        createCsvFile("file1");
+        createCsvFile("file2");
+        Object is1 = getInputStream("file1");
+        Object is2 = getInputStream("file2");
+
+        ReportPage reportPage1 = factory.create(is1, UTF_8, CsvReportPage.getDefaultCsvParserSettings());
+        ReportPage reportPage2 = factory.create(is2, UTF_8, CsvReportPage.getDefaultCsvParserSettings());
+
+        assertNotSame(reportPage1, reportPage2);
+        assertSame(CsvReportPage.class, reportPage1.getClass());
+        assertSame(CsvReportPage.class, reportPage2.getClass());
+    }
+
+    @Test
+    void create_unknownConstructorArgTypes_exception() {
+        // impl with constructor of (String, String) types not found
+        assertThrows(ReportPageInstantiationException.class, () -> factory.create("arg1", "arg2"));
     }
 }

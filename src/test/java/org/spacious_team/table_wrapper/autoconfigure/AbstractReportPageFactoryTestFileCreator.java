@@ -28,20 +28,23 @@ import nl.fountain.xelem.excel.ss.XLWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.FileSystemUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-class DefaultReportPageFactoryTestFileCreator {
+class AbstractReportPageFactoryTestFileCreator {
     static final Path root = Path.of("target", "test-classes", "test-data");
     static final String sheetName = "SheetA";
 
     @SneakyThrows
     static void creteFiles() {
-        Files.createDirectories(root);
+        createRoot();
         createBinFile("test.bin");
         createCsvFile("test.csv");
         createCsvFile("test.txt");
@@ -51,13 +54,25 @@ class DefaultReportPageFactoryTestFileCreator {
     }
 
     @SneakyThrows
+    static void createRoot() {
+        Files.createDirectories(root);
+    }
+
+    @SneakyThrows
     static void deleteFiles() {
-        //noinspection ResultOfMethodCallIgnored
-        root.toFile().delete();
+        FileSystemUtils.deleteRecursively(root);
     }
 
     static Path getPath(String fileName) {
         return root.resolve(fileName);
+    }
+
+    @SneakyThrows
+    static InputStream getInputStream(String fileName) {
+        Path path = getPath(fileName);
+        try (InputStream is = Files.newInputStream(path)) {
+            return new ByteArrayInputStream(is.readAllBytes());
+        }
     }
 
     static void createBinFile(@SuppressWarnings("SameParameterValue") String fileName) throws IOException {

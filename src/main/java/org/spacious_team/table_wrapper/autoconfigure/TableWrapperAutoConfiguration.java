@@ -26,6 +26,7 @@ import org.spacious_team.table_wrapper.xml.XmlTableFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -75,13 +76,13 @@ public class TableWrapperAutoConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(DefaultReportPageFactory.class)
+    @ConditionalOnClass(AbstractReportPageFactory.class)
     public static class TableWrapperConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public ReportPageFactory tableFactories() {
-            return new DefaultReportPageFactory();
+        public ReportPageFactory tableFactories(ApplicationContext context) {
+            return new DefaultReportPageFactory(context);
         }
     }
 }
