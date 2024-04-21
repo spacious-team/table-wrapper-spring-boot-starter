@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
-public class AbstractReportPageFactoryTest {
+public class DefaultReportPageFactoryTest {
 
-    AbstractReportPageFactory factory = new AbstractReportPageFactory();
+    DefaultReportPageFactory factory = new DefaultReportPageFactory();
 
     @BeforeAll
     static void beforeTests() {

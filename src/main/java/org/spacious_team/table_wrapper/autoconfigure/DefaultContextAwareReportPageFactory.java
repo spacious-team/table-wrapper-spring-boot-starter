@@ -34,7 +34,7 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 
 @Getter
 @RequiredArgsConstructor
-public class DefaultContextAwareReportPageFactory extends AbstractReportPageFactory implements ContextAwareReportPageFactory {
+public class DefaultContextAwareReportPageFactory extends DefaultReportPageFactory implements ContextAwareReportPageFactory {
 
     private final List<Class<? extends ReportPage>> registeredReportPageTypes = new CopyOnWriteArrayList<>();
     private final ApplicationContext context;

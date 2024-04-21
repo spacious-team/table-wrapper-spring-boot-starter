@@ -42,15 +42,15 @@ import java.nio.file.Path;
 
 import static java.nio.file.StandardOpenOption.READ;
 import static java.util.Objects.nonNull;
-import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactory.KnownFileExtension.XLS;
-import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactory.KnownFileExtension.XLSX;
+import static org.spacious_team.table_wrapper.autoconfigure.DefaultReportPageFactory.KnownFileExtension.XLS;
+import static org.spacious_team.table_wrapper.autoconfigure.DefaultReportPageFactory.KnownFileExtension.XLSX;
 
 /**
  * Implements methods for quickly instantiating ReportPage implementations:
  * {@link ExcelSheet}, {@link XmlReportPage} and {@link CsvReportPage}
  * using well-known constructors.
  */
-public class AbstractReportPageFactory implements ReportPageFactory {
+public class DefaultReportPageFactory implements ReportPageFactory {
 
     @Override
     public ReportPage create(Path path, Integer sheetNumber) {
