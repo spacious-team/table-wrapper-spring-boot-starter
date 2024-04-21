@@ -152,7 +152,7 @@ public class DefaultContextAwareReportPageFactoryTest {
     @Test
     void create_unknownConstructorArgTypes_exception() {
         // impl with constructor of (String, String) types not found
-        assertThrows(ReportPageInstantiationException.class, () -> factory.create("arg1", "arg2"));
+        assertThrows(ReportPageInstantiationException.class, () -> factory.create("arg1", "arg2", "arg3"));
     }
 
     @Test
