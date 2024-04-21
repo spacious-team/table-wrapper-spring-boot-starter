@@ -30,7 +30,10 @@ jobs:
         run: mvn --batch-mode clean test
 
       - name: Test Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: spacious-team/table-wrapper-spring-boot-starter
 
       - name: SonarCloud Analyze
         run: >
