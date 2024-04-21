@@ -2,6 +2,10 @@
 [![spring-boot-version](https://img.shields.io/badge/spring--boot-2.7+-brightgreen?style=flat-square)](https://github.com/spring-projects/spring-boot/releases)
 [![jitpack-last-release](https://jitpack.io/v/spacious-team/table-wrapper-spring-boot-starter.svg?style=flat-square)](
 https://jitpack.io/#spacious-team/table-wrapper-api)
+[![Unit tests](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fspacious-team%2Ftable-wrapper-spring-boot-starter%2Fbadge%3Fref%3Ddevelop&style=flat-square&label=Test&logo=none)](
+https://github.com/spacious-team/table-wrapper-spring-boot-starter/actions/workflows/unit-tests.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/spacious-team/table-wrapper-spring-boot-starter/develop?label=Coverage&style=flat-square&token=kqEvgEiKnQ)](
+https://codecov.io/gh/spacious-team/table-wrapper-spring-boot-starter)
 
 ### Назначение
 Позволяет работать с табличным представлением данных в форматах Excel, Xml и Csv через единый интерфейс
