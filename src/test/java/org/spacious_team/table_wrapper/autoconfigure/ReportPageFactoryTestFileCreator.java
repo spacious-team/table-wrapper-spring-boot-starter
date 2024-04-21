@@ -38,7 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-class AbstractReportPageFactoryTestFileCreator {
+class ReportPageFactoryTestFileCreator {
     static final Path root = Path.of("target", "test-classes", "test-data");
     static final String sheetName = "SheetA";
 

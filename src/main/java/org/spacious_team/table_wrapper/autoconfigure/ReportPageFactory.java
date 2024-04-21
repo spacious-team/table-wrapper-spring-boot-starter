@@ -84,19 +84,4 @@ public interface ReportPageFactory {
      *                                          or ReportPage instance creation fails
      */
     ReportPage create(InputStream is, String sheetName);
-
-    /**
-     * Register prototype spring bean definition for ReportPage implementation.
-     * This class can subsequently be created using the method {@link #create(Object...)}
-     */
-    void registerBeanDefinition(Class<? extends ReportPage> clazz);
-
-    /**
-     * Chooses ReportPage implementation by its constructor argument types and creates it.
-     * Use this method if ReportPage should be created with nonstandard configuration.
-     *
-     * @throws ReportPageInstantiationException if ReportPage implementation constructor not found
-     *                                          or ReportPage instance creation fails
-     */
-    ReportPage create(Object... args);
 }

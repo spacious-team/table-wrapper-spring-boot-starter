@@ -50,7 +50,7 @@ import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFa
  * {@link ExcelSheet}, {@link XmlReportPage} and {@link CsvReportPage}
  * using well-known constructors.
  */
-public abstract class AbstractReportPageFactory implements ReportPageFactory {
+public class AbstractReportPageFactory implements ReportPageFactory {
 
     @Override
     public ReportPage create(Path path, Integer sheetNumber) {

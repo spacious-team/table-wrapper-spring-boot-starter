@@ -18,39 +18,30 @@
 
 package org.spacious_team.table_wrapper.autoconfigure;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.spacious_team.table_wrapper.api.ReportPage;
-import org.spacious_team.table_wrapper.csv.CsvReportPage;
-import org.spacious_team.table_wrapper.excel.ExcelSheet;
-import org.spacious_team.table_wrapper.xml.XmlReportPage;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Stream;
 
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
+@Getter
 @RequiredArgsConstructor
-public class DefaultReportPageFactory extends AbstractReportPageFactory {
+public class DefaultContextAwareReportPageFactory extends AbstractReportPageFactory implements ContextAwareReportPageFactory {
 
-    private final List<Class<? extends ReportPage>> knownReportPageTypes = new CopyOnWriteArrayList<>();
+    private final List<Class<? extends ReportPage>> registeredReportPageTypes = new CopyOnWriteArrayList<>();
     private final ApplicationContext context;
-
-    @PostConstruct
-    public void init() {
-        Stream.of(ExcelSheet.class, XmlReportPage.class, CsvReportPage.class)
-                .forEach(this::registerBeanDefinition);
-    }
 
     @Override
     public void registerBeanDefinition(Class<? extends ReportPage> clazz) {
-        knownReportPageTypes.add(clazz);
+        registeredReportPageTypes.add(clazz);
         String beanName = getBeanName(clazz);
         BeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(clazz)
                 .setScope(SCOPE_PROTOTYPE)
@@ -72,7 +63,7 @@ public class DefaultReportPageFactory extends AbstractReportPageFactory {
 
     @Override
     public ReportPage create(Object... args) {
-        for (Class<? extends ReportPage> clazz : knownReportPageTypes) {
+        for (Class<? extends ReportPage> clazz : registeredReportPageTypes) {
             try {
                 return context.getBean(clazz, args);
             } catch (Exception ignore) {

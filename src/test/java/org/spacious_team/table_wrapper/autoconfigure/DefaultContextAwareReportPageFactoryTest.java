@@ -28,6 +28,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.spacious_team.table_wrapper.api.ReportPage;
+import org.spacious_team.table_wrapper.api.ReportPageRow;
+import org.spacious_team.table_wrapper.api.TableCellAddress;
 import org.spacious_team.table_wrapper.csv.CsvReportPage;
 import org.spacious_team.table_wrapper.excel.ExcelSheet;
 import org.spacious_team.table_wrapper.xml.XmlReportPage;
@@ -36,16 +38,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactoryTestFileCreator.*;
+import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
 @SpringBootTest(classes = TableWrapperAutoConfiguration.class)
-public class DefaultReportPageFactoryTest {
+public class DefaultContextAwareReportPageFactoryTest {
 
     @Autowired
-    DefaultReportPageFactory factory;
+    DefaultContextAwareReportPageFactory factory;
 
     @BeforeAll
     static void beforeTests() {
@@ -150,5 +153,48 @@ public class DefaultReportPageFactoryTest {
     void create_unknownConstructorArgTypes_exception() {
         // impl with constructor of (String, String) types not found
         assertThrows(ReportPageInstantiationException.class, () -> factory.create("arg1", "arg2"));
+    }
+
+    @Test
+    void registerBeanDefinition() {
+        int registeredTypes = factory.getRegisteredReportPageTypes().size();
+
+        factory.registerBeanDefinition(TestReportPage.class);
+        ReportPage reportPage = factory.create("arg1", "arg2");
+
+        assertSame(TestReportPage.class, reportPage.getClass());
+        assertEquals(registeredTypes + 1, factory.getRegisteredReportPageTypes().size());
+        assertSame(TestReportPage.class, factory.getRegisteredReportPageTypes().get(registeredTypes));
+    }
+
+
+    private static class TestReportPage implements ReportPage {
+
+        @SuppressWarnings("unused")
+        public TestReportPage(String arg1, String arg2) {
+        }
+
+        @Override
+        public TableCellAddress find(Object value, int startRow, int endRow, int startColumn, int endColumn) {
+            return TableCellAddress.NOT_FOUND;
+        }
+
+        @Override
+        public TableCellAddress find(int startRow, int endRow,
+                                     int startColumn, int endColumn,
+                                     Predicate<Object> cellValuePredicate) {
+            return TableCellAddress.NOT_FOUND;
+        }
+
+        @Override
+        @SuppressWarnings("ReturnOfNull")
+        public ReportPageRow getRow(int i) {
+            return null;
+        }
+
+        @Override
+        public int getLastRowNum() {
+            return -1;
+        }
     }
 }

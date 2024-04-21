@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.spacious_team.table_wrapper.api.ReportPage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,11 +32,11 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactoryTestFileCreator.*;
+import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
 public class AbstractReportPageFactoryTest {
 
-    AbstractReportPageFactory factory = new TestReportPageFactory();
+    AbstractReportPageFactory factory = new AbstractReportPageFactory();
 
     @BeforeAll
     static void beforeTests() {
@@ -156,18 +155,5 @@ public class AbstractReportPageFactoryTest {
         });
         assertNotNull(factory.create(is));
         verify(is, never()).close();
-    }
-
-
-    private static class TestReportPageFactory extends AbstractReportPageFactory {
-        @Override
-        public void registerBeanDefinition(Class<? extends ReportPage> clazz) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public ReportPage create(Object... args) {
-            throw new UnsupportedOperationException();
-        }
     }
 }
