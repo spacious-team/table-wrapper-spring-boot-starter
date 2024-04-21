@@ -87,7 +87,7 @@ public class TableWrapperAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public ContextAwareReportPageFactory defaultReportPageFactory(ApplicationContext context) {
+        public ContextAwareReportPageFactory defaultContextAwareReportPageFactory(ApplicationContext context) {
             DefaultContextAwareReportPageFactory factory = new DefaultContextAwareReportPageFactory(context);
             Stream.of(ExcelSheet.class, XmlReportPage.class, CsvReportPage.class)
                     .forEach(factory::registerBeanDefinition);

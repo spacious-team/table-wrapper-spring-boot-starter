@@ -114,25 +114,26 @@ class ReportPageFactoryTestFileCreator {
 
     static void createExcelFile(String fileName, org.apache.poi.ss.usermodel.Workbook workbook) throws IOException {
         Path path = getPath(fileName);
-        FileOutputStream fos = new FileOutputStream(path.toFile());
+        try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
 
-        Sheet sheet = workbook.createSheet(sheetName);
-        org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
-        row.createCell(0).setCellValue("Table 1");
-        row = sheet.createRow(1);
-        row.createCell(0).setCellValue("a");
-        row.createCell(1).setCellValue("b");
-        row.createCell(2).setCellValue("c");
-        row = sheet.createRow(2);
-        row.createCell(0).setCellValue(1);
-        row.createCell(1).setCellValue(2);
-        row.createCell(2).setCellValue(3);
-        row = sheet.createRow(3);
-        row.createCell(0).setCellValue("a4");
-        row.createCell(1).setCellValue("b5");
-        row.createCell(2).setCellValue("c6");
+            Sheet sheet = workbook.createSheet(sheetName);
+            org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("Table 1");
+            row = sheet.createRow(1);
+            row.createCell(0).setCellValue("a");
+            row.createCell(1).setCellValue("b");
+            row.createCell(2).setCellValue("c");
+            row = sheet.createRow(2);
+            row.createCell(0).setCellValue(1);
+            row.createCell(1).setCellValue(2);
+            row.createCell(2).setCellValue(3);
+            row = sheet.createRow(3);
+            row.createCell(0).setCellValue("a4");
+            row.createCell(1).setCellValue("b5");
+            row.createCell(2).setCellValue("c6");
 
 
-        workbook.write(fos);
+            workbook.write(fos);
+        }
     }
 }
