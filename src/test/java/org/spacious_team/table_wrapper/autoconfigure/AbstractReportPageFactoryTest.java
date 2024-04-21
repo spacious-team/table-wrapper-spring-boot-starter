@@ -20,16 +20,19 @@ package org.spacious_team.table_wrapper.autoconfigure;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.spacious_team.table_wrapper.api.ReportPage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFactoryTestFileCreator.*;
 
 public class AbstractReportPageFactoryTest {
@@ -125,6 +128,34 @@ public class AbstractReportPageFactoryTest {
     void create_namedSheetForCsvByInputStream_ok(String fileName) {
         InputStream is = getInputStream(fileName);
         assertNotNull(factory.create(is, "SheetB"));
+    }
+
+    @Test
+    void create_byteArrayInputStream_closed() throws IOException {
+        InputStream is = spy(new ByteArrayInputStream(new byte[0]));
+        assertNotNull(factory.create(is));
+        verify(is, atLeast(1)).close();
+    }
+
+    @Test
+    void create_instanceOfByteArrayInputStream_closed() throws IOException {
+        InputStream is = spy(new ByteArrayInputStream(new byte[0]) {
+            // own class impl extending ByteArrayInputStream
+        });
+        assertNotNull(factory.create(is));
+        verify(is, never()).close();
+    }
+
+    @Test
+    void create_notByteArrayInputStreamImpl_notClosed() throws IOException {
+        InputStream is = spy(new InputStream() {
+            @Override
+            public int read() {
+                return -1;
+            }
+        });
+        assertNotNull(factory.create(is));
+        verify(is, never()).close();
     }
 
 

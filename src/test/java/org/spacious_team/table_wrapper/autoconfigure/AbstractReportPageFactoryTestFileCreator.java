@@ -71,7 +71,7 @@ class AbstractReportPageFactoryTestFileCreator {
     static InputStream getInputStream(String fileName) {
         Path path = getPath(fileName);
         try (InputStream is = Files.newInputStream(path)) {
-            return new ByteArrayInputStream(is.readAllBytes());
+            return new ByteArrayInputStream(is.readAllBytes());  // read all bytes here for release file's InputStream
         }
     }
 

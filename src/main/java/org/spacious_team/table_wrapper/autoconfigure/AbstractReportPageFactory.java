@@ -47,7 +47,7 @@ import static org.spacious_team.table_wrapper.autoconfigure.AbstractReportPageFa
 
 /**
  * Implements methods for quickly instantiating ReportPage implementations:
- *  {@link ExcelSheet}, {@link XmlReportPage} and {@link CsvReportPage}
+ * {@link ExcelSheet}, {@link XmlReportPage} and {@link CsvReportPage}
  * using well-known constructors.
  */
 public abstract class AbstractReportPageFactory implements ReportPageFactory {
@@ -201,14 +201,13 @@ public abstract class AbstractReportPageFactory implements ReportPageFactory {
     }
 
     /**
-     * @implSpec Closes InputStream
+     * @implSpec Does not close InputStream
      */
     public static ByteArrayInputStream convertToByteArrayInputStream(InputStream inputStream) throws IOException {
-        if (inputStream instanceof ByteArrayInputStream) {
-            return (ByteArrayInputStream) inputStream;
+        if (inputStream.getClass() == ByteArrayInputStream.class) {
+            return (ByteArrayInputStream) inputStream;  // close() do nothing
         } else {
             byte[] bytes = inputStream.readAllBytes();
-            inputStream.close();
             return new ByteArrayInputStream(bytes);
         }
     }
