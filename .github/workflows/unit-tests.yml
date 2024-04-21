@@ -31,9 +31,8 @@ jobs:
 
       - name: Test Coverage
         uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: spacious-team/table-wrapper-spring-boot-starter
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: SonarCloud Analyze
         run: >
