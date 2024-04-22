@@ -129,6 +129,22 @@ public class DefaultReportPageFactoryTest {
         assertNotNull(factory.create(is, "SheetB"));
     }
 
+    // Test unexpected type sheet id
+
+    @ParameterizedTest
+    @ValueSource(strings = {"test.xls", "test.xlsx", "test.xml", "test.txt", "test.bin"})
+    void create_unknownTypeSheetId_exception(String fileName) {
+        Path path = getPath(fileName);
+        assertThrows(ReportPageInstantiationException.class, () -> factory.doCreate(path, new Object()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"test.csv"})
+    void create_csvWithUnknownTypeSheetId_ok(String fileName) {
+        Path path = getPath(fileName);
+        assertNotNull(factory.doCreate(path, new Object()));
+    }
+
     // test InputStream closing
 
     @Test
