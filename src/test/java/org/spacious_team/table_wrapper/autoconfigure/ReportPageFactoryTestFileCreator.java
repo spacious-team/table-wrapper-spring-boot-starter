@@ -49,8 +49,12 @@ class ReportPageFactoryTestFileCreator {
         createCsvFile("test.csv");
         createCsvFile("test.txt");
         createXmlFile("test.xml");
-        createExcelFile("test.xls", new HSSFWorkbook());
-        createExcelFile("test.xlsx", new XSSFWorkbook());
+        try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+            createExcelFile("test.xls", workbook);
+        }
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            createExcelFile("test.xlsx", workbook);
+        }
     }
 
     @SneakyThrows
@@ -68,7 +72,7 @@ class ReportPageFactoryTestFileCreator {
     }
 
     @SneakyThrows
-    static InputStream getInputStream(String fileName) {
+    static ByteArrayInputStream getInputStream(String fileName) {
         Path path = getPath(fileName);
         try (InputStream is = Files.newInputStream(path)) {
             return new ByteArrayInputStream(is.readAllBytes());  // read all bytes here for release file's InputStream
@@ -131,7 +135,6 @@ class ReportPageFactoryTestFileCreator {
             row.createCell(0).setCellValue("a4");
             row.createCell(1).setCellValue("b5");
             row.createCell(2).setCellValue("c6");
-
 
             workbook.write(fos);
         }

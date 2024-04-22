@@ -205,7 +205,7 @@ public class DefaultReportPageFactory implements ReportPageFactory {
      */
     public static ByteArrayInputStream convertToByteArrayInputStream(InputStream inputStream) throws IOException {
         if (inputStream.getClass() == ByteArrayInputStream.class) {
-            return (ByteArrayInputStream) inputStream;  // close() do nothing
+            return (ByteArrayInputStream) inputStream;  // close() does nothing
         } else {
             byte[] bytes = inputStream.readAllBytes();
             return new ByteArrayInputStream(bytes);
@@ -214,6 +214,9 @@ public class DefaultReportPageFactory implements ReportPageFactory {
 
     @SuppressWarnings("DataFlowIssue")
     private static boolean isEmptyCsvReportPage(CsvReportPage reportPage) {
+        if (reportPage.getLastRowNum() == -1) {
+            return true;
+        }
         // has only one Cell with NULL value
         return reportPage.getLastRowNum() == 0 &&
                 reportPage.getCell(TableCellAddress.of(0, 0)) != null &&

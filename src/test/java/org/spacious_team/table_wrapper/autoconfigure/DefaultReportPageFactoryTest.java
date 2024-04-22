@@ -71,14 +71,14 @@ public class DefaultReportPageFactoryTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"test.txt", "test.bin"})
-    void create_firstSheetByPath_exception(String fileName) {
+    void create_byPathWithUnknownFilenameExt_exception(String fileName) {
         Path path = getPath(fileName);
         assertThrows(ReportPageInstantiationException.class, () -> factory.create(path));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"test.bin"})
-    void create_firstSheetByInputStream_exception(String fileName) {
+    void create_byInputStreamOfBinaryFile_exception(String fileName) {
         InputStream is = getInputStream(fileName);
         assertThrows(ReportPageInstantiationException.class, () -> factory.create(is));
     }
@@ -129,6 +129,8 @@ public class DefaultReportPageFactoryTest {
         assertNotNull(factory.create(is, "SheetB"));
     }
 
+    // test InputStream closing
+
     @Test
     void create_byteArrayInputStream_closed() throws IOException {
         InputStream is = spy(new ByteArrayInputStream(new byte[0]));
@@ -137,7 +139,7 @@ public class DefaultReportPageFactoryTest {
     }
 
     @Test
-    void create_instanceOfByteArrayInputStream_closed() throws IOException {
+    void create_instanceOfByteArrayInputStream_notClosed() throws IOException {
         InputStream is = spy(new ByteArrayInputStream(new byte[0]) {
             // own class impl extending ByteArrayInputStream
         });
