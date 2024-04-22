@@ -20,16 +20,23 @@ package org.spacious_team.table_wrapper.autoconfigure;
 
 
 import org.spacious_team.table_wrapper.api.TableFactoryRegistry;
+import org.spacious_team.table_wrapper.csv.CsvReportPage;
 import org.spacious_team.table_wrapper.csv.CsvTableFactory;
+import org.spacious_team.table_wrapper.excel.ExcelSheet;
 import org.spacious_team.table_wrapper.excel.ExcelTableFactory;
+import org.spacious_team.table_wrapper.xml.XmlReportPage;
 import org.spacious_team.table_wrapper.xml.XmlTableFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.stream.Stream;
+
 @AutoConfiguration
+@SuppressWarnings("unused")
 @ConditionalOnClass(TableFactoryRegistry.class)
 public class TableWrapperAutoConfiguration {
 
@@ -54,7 +61,7 @@ public class TableWrapperAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public XmlTableFactory xmlTableFactory() {
-            XmlTableFactory factory =  new XmlTableFactory();
+            XmlTableFactory factory = new XmlTableFactory();
             TableFactoryRegistry.add(factory);
             return factory;
         }
@@ -68,8 +75,22 @@ public class TableWrapperAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public CsvTableFactory csvTableFactory() {
-            CsvTableFactory factory =  new CsvTableFactory();
+            CsvTableFactory factory = new CsvTableFactory();
             TableFactoryRegistry.add(factory);
+            return factory;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(DefaultContextAwareReportPageFactory.class)
+    public static class TableWrapperConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ContextAwareReportPageFactory defaultContextAwareReportPageFactory(ApplicationContext context) {
+            DefaultContextAwareReportPageFactory factory = new DefaultContextAwareReportPageFactory(context);
+            Stream.of(ExcelSheet.class, XmlReportPage.class, CsvReportPage.class)
+                    .forEach(factory::registerBeanDefinition);
             return factory;
         }
     }

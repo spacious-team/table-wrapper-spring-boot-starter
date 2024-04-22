@@ -2,6 +2,10 @@
 [![spring-boot-version](https://img.shields.io/badge/spring--boot-2.7+-brightgreen?style=flat-square)](https://github.com/spring-projects/spring-boot/releases)
 [![jitpack-last-release](https://jitpack.io/v/spacious-team/table-wrapper-spring-boot-starter.svg?style=flat-square)](
 https://jitpack.io/#spacious-team/table-wrapper-api)
+[![Unit tests](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fspacious-team%2Ftable-wrapper-spring-boot-starter%2Fbadge%3Fref%3Ddevelop&style=flat-square&label=Test&logo=none)](
+https://github.com/spacious-team/table-wrapper-spring-boot-starter/actions/workflows/unit-tests.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/spacious-team/table-wrapper-spring-boot-starter/develop?label=Coverage&style=flat-square&token=kqEvgEiKnQ)](
+https://codecov.io/gh/spacious-team/table-wrapper-spring-boot-starter)
 
 ### Назначение
 Позволяет работать с табличным представлением данных в форматах Excel, Xml и Csv через единый интерфейс
@@ -67,7 +71,7 @@ Spring Boot Starter настраивает реализации фабрик `Ex
 - короткий десяти значный номер коммита для сборки зависимости с указанного коммита.
 
 ### Пример использования
-Определяются колонки таблицы вне зависимости от формата файла (excel, xml, csv и др.):
+Определяются колонки таблицы:
 ```java
 @lombok.Getter
 @lombok.RequiredArgsConstructor
@@ -78,20 +82,28 @@ enum TableHeader implements TableHeaderColumn {
     private final TableColumn column;
 }
 ```
-Извлекаем данные в описанном формате, например, из Excel файла через Stream API
+Извлекаем данные из таблицы с указанными колонками вне зависимости от формата файла (excel, xml, csv и др.):
 ```java
-Workbook book = new XSSFWorkbook(xlsFileinputStream);          // открываем Excel файл
-ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // используем 1-ый лист Excel файла для поиска таблицы
+@org.springframework.beans.factory.annotation.Autowired
+ReportPageFactory reportPageFactory;
 
-// Регистронезависимо найдет ячейку с текстом "Таблица 1",
-// парсит следующую за ней строку как заголовок таблицы,
-// оставшиеся строки парсятся как данные до пустой строки или конца файла
-Table table = reportPage.create("таблица 1", TableHeader.class);  // метод использует бин ExcelTableFactory для создания таблицы
+void parse() {
+    // Получаем страницу с данными. Используем бин ReportPageFactory для построения абстракции
+    ReportPage reportPage = reportPageFactory.create("1.xlsx");
+    // ... или reportPageFactory.create("1.xml");
+    // ... или reportPageFactory.create("1.csv");
 
-// Извлекаем и обрабатываем строки таблицы
-table.stream()
-        .forEach(row -> {
-            String product = row.getStringCellValue(TableHeader.PRODUCT);
-            BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
-        });
+    // Метод найдет ячейку с текстом "Таблица 1",
+    // воспринимает следующую за ней строку как заголовок таблицы (который описан через enum TableHeader).
+    // Из последующих строк (до пустой строки или конца файла) извлекаются данные
+    // (метод использует бин ExcelTableFactory для создания таблицы Table на основе ReportPage) 
+    Table table = reportPage.create("Таблица 1", TableHeader.class);
+
+    // Итерируемся по строкам таблицы и извлекаем ячейки из строк по заголовку таблицы
+    table.stream()
+            .forEach(row -> {
+                String product = row.getStringCellValue(TableHeader.PRODUCT);
+                BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
+            });
+}
 ```
