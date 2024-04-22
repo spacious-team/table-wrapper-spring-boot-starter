@@ -88,45 +88,22 @@ enum TableHeader implements TableHeaderColumn {
 ReportPageFactory reportPageFactory;
 
 void parse() {
-    // Получаем страницу с данными
-    Object page = getFromExcel("1.xlsx");
-    // ... или page = getFromXml("1.xml");
-    // ... или page = getFromCsv("1.csv");
-
-    // Используем бин ReportPageFactory для построения абстракции
-    ReportPage reportPage = reportPageFactory.create(page);
+    // Получаем страницу с данными. Используем бин ReportPageFactory для построения абстракции
+    ReportPage reportPage = reportPageFactory.create("1.xlsx");
+    // ... или reportPageFactory.create("1.xml");
+    // ... или reportPageFactory.create("1.csv");
 
     // Метод найдет ячейку с текстом "Таблица 1",
-    // воспринимает следующую за ней строку как заголовок таблицы,
-    // из последующих строк (до пустой строки или конца файла) извлекаются данные
-    Table table = reportPage.create("Таблица 1", TableHeader.class);  // метод использует бин ExcelTableFactory для создания таблицы
+    // воспринимает следующую за ней строку как заголовок таблицы (который описан через enum TableHeader).
+    // Из последующих строк (до пустой строки или конца файла) извлекаются данные
+    // (метод использует бин ExcelTableFactory для создания таблицы Table на основе ReportPage) 
+    Table table = reportPage.create("Таблица 1", TableHeader.class);
 
-    // Извлекаем и обрабатываем данные из строк таблицы
+    // Итерируемся по строкам таблицы и извлекаем ячейки из строк по заголовку таблицы
     table.stream()
             .forEach(row -> {
                 String product = row.getStringCellValue(TableHeader.PRODUCT);
                 BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
             });
-}
-```
-Пример реализации методов для чтения файлов форматов excel, xml, csv:
-```java
-Sheet getFromExcel(String fileName) {
-    Path path = Paths.get(fileName);
-    try (InputStream is = Files.newInputStream(path)) {
-        Workbook book = new XSSFWorkbook(is);  // открываем Excel файл
-        Sheet sheet = book.getSheetAt(0);      // используем 1-ый лист Excel файла для поиска таблицы
-    }
-}
-
-Workbook getFromXml(String fileName) {
-    ExcelReader reader = new ExcelReader();
-    return reader.getWorkbook(fileName);       // открываем Excel таблицу из .xml файла 
-}
-
-String[][] getFromCsv(String fileName) {
-    File file = new File(fileName);
-    CsvParser parser = new CsvParser(new CsvParserSettings());
-    return parser.parseAll(file).toArray(new String[0][]);     // открываем таблицу из .csv файла 
 }
 ```
