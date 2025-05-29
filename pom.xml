@@ -6,7 +6,7 @@
 
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-spring-boot-starter</artifactId>
-    <version>2025.1</version>
+    <version>2025.2</version>
     <packaging>jar</packaging>
 
     <name>Spring Boot Starter for Table Wrapper</name>
