@@ -6,7 +6,7 @@
 
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-spring-boot-starter</artifactId>
-    <version>2025.1</version>
+    <version>2025.2</version>
     <packaging>jar</packaging>
 
     <name>Spring Boot Starter for Table Wrapper</name>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.github.spacious-team</groupId>
             <artifactId>table-wrapper-excel-impl</artifactId>
-            <version>2024.1</version>
+            <version>2025.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.spacious-team</groupId>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.17.0</version>
+            <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
