@@ -171,7 +171,7 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         return doCreate(is, sheetName);
     }
 
-    public ReportPage doCreate(InputStream is, Object sheetId) {
+    protected ReportPage doCreate(InputStream is, Object sheetId) {
         try {
             ByteArrayInputStream bais = convertToByteArrayInputStream(is);
             // try Excel file

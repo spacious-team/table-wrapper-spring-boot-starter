@@ -129,6 +129,12 @@ public class DefaultReportPageFactoryTest {
         assertNotNull(factory.create(is, "SheetB"));
     }
 
+    @Test
+    void create_emptyFile_exception() {
+        InputStream is = getInputStream("empty.txt");
+        assertThrows(ReportPageInstantiationException.class, () -> factory.create(is, "SheetB"));
+    }
+
     // Test unexpected type sheet id
 
     @ParameterizedTest

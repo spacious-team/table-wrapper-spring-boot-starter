@@ -48,6 +48,7 @@ class ReportPageFactoryTestFileCreator {
         createBinFile("test.bin");
         createCsvFile("test.csv");
         createCsvFile("test.txt");
+        createEmptyFile("empty.txt");
         createXmlFile("test.xml");
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {
             createExcelFile("test.xls", workbook);
@@ -87,6 +88,12 @@ class ReportPageFactoryTestFileCreator {
 
     static void createCsvFile(String fileName) throws IOException {
         List<String> lines = List.of("Table 1", "a;b;c", "1;2;3", "a4;b5;c6");
+        Path path = getPath(fileName);
+        Files.write(path, lines);
+    }
+
+    static void createEmptyFile(@SuppressWarnings("SameParameterValue") String fileName) throws IOException {
+        List<String> lines = List.of("");
         Path path = getPath(fileName);
         Files.write(path, lines);
     }
