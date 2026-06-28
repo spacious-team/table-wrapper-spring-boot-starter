@@ -93,11 +93,12 @@ void parse() {
     // ... или reportPageFactory.create("1.xml");
     // ... или reportPageFactory.create("1.csv");
 
-    // Метод найдет ячейку с текстом "Таблица 1",
-    // воспринимает следующую за ней строку как заголовок таблицы (который описан через enum TableHeader).
-    // Из последующих строк (до пустой строки или конца файла) извлекаются данные
-    // (метод использует бин ExcelTableFactory для создания таблицы Table на основе ReportPage) 
-    Table table = reportPage.create("Таблица 1", TableHeader.class);
+    // Регистронезависимо найдет ячейку с текстом "Таблица 1" - это имя таблицы.
+    // Имя таблицы описано в единственной строке (2ой аргумент).
+    // Парсит следующую 1 строку (5ый аргумент) как заголовок таблицы (заголовок описан с помощью enum TableHeader).
+    // Последующие строки парсятся как данные до пустой строки или конца файла (3ий аргумент 'null')
+    // (метод использует бин ExcelTableFactory для создания таблицы Table на основе ReportPage).
+    Table table = reportPage.createTable("Таблица 1", 1, null, TableHeader.class, 1);
 
     // Итерируемся по строкам таблицы и извлекаем ячейки из строк по заголовку таблицы
     table.stream()
@@ -106,4 +107,25 @@ void parse() {
                 BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
             });
 }
+```
+
+### Чтение таблиц из файла с вашим форматом данных
+Автоконфигурация поставляет зависимости для чтения таблиц из excel, xml и csv файлов.
+Если у вас есть собственная реализация формата [Table Wrapper API](https://github.com/spacious-team/table-wrapper-api),
+прочтите таблицу следующим образом:
+```java
+// 1. Выполните регистрацию фабрики вашего формата данных
+CustomTableFactory factory = new CustomTableFactory();  // CustomTableFactory implements TableFactory
+TableFactoryRegistry.add(factory);
+
+// 2. Создайте объект вашего класса доступа к данным, например из файла (может быть любой источник, кроме файла)
+CustomReportPage reportPage = new CustomReportPage("My file.txt");  // CustomReportPage implements ReportPage
+
+// 3. Прочитайте таблицу из вашего файла тем же API, что и для excel, xml, csv файла
+Table table = reportPage.createTable("Таблица 1", 1, null, TableHeader.class, 1);
+table.stream()
+        .forEach(row -> {
+            String product = row.getStringCellValue(TableHeader.PRODUCT);
+            BigDecimal price = getBigDecimalCellValue(TableHeader.PRICE);
+        });
 ```

@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.autoconfigure;
 
 
+import lombok.NoArgsConstructor;
 import org.spacious_team.table_wrapper.api.TableFactoryRegistry;
 import org.spacious_team.table_wrapper.csv.CsvReportPage;
 import org.spacious_team.table_wrapper.csv.CsvTableFactory;
@@ -35,8 +36,11 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.stream.Stream;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @AutoConfiguration
 @SuppressWarnings("unused")
+@NoArgsConstructor(access = PRIVATE)
 @ConditionalOnClass(TableFactoryRegistry.class)
 public class TableWrapperAutoConfiguration {
 

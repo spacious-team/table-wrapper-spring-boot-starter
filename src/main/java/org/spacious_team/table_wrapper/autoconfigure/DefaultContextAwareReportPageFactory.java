@@ -20,6 +20,7 @@ package org.spacious_team.table_wrapper.autoconfigure;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.spacious_team.table_wrapper.api.ReportPage;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -63,12 +64,19 @@ public class DefaultContextAwareReportPageFactory extends DefaultReportPageFacto
 
     @Override
     public ReportPage create(Object... args) {
+        @MonotonicNonNull Exception last = null;
         for (Class<? extends ReportPage> clazz : registeredReportPageTypes) {
             try {
                 return context.getBean(clazz, args);
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                last = e;
             }
         }
-        throw new ReportPageInstantiationException("Can't create ReportPage with arguments: " + List.of(args));
+        String message = "Can't create ReportPage with arguments: " + List.of(args);
+        if (last == null) {
+            throw new ReportPageInstantiationException(message);
+        } else {
+            throw new ReportPageInstantiationException(message, last);
+        }
     }
 }

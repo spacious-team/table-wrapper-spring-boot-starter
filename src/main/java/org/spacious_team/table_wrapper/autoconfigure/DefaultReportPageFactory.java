@@ -25,14 +25,18 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spacious_team.table_wrapper.api.ReportPage;
+import org.spacious_team.table_wrapper.api.TableCell;
 import org.spacious_team.table_wrapper.api.TableCellAddress;
 import org.spacious_team.table_wrapper.csv.CsvReportPage;
 import org.spacious_team.table_wrapper.excel.ExcelSheet;
 import org.spacious_team.table_wrapper.xml.XmlReportPage;
 import org.springframework.util.Assert;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,7 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static java.nio.file.StandardOpenOption.READ;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.spacious_team.table_wrapper.autoconfigure.DefaultReportPageFactory.KnownFileExtension.XLS;
 import static org.spacious_team.table_wrapper.autoconfigure.DefaultReportPageFactory.KnownFileExtension.XLSX;
 
@@ -69,12 +73,12 @@ public class DefaultReportPageFactory implements ReportPageFactory {
             switch (extension) {
                 case XLS:
                 case XLSX:
-                    Assert.isTrue(nonNull(sheetId), "Excel file's sheet number or name expected");
+                    Assert.notNull(sheetId, "Excel file's sheet number or name expected");
                     is = openForRead(path);
                     Sheet sheet = getExcelSheet(is, sheetId, extension);
                     return new ExcelSheet(sheet);
                 case XML:
-                    Assert.isTrue(nonNull(sheetId), "Xml file's sheet number or name expected");
+                    Assert.notNull(sheetId, "Xml file's sheet number or name expected");
                     is = openForRead(path);
                     Worksheet worksheet = getXmlSheet(is, sheetId);
                     return new XmlReportPage(worksheet);
@@ -124,7 +128,8 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         }
     }
 
-    private static Worksheet getXmlSheet(InputStream is, Object sheetId) throws Exception {
+    private static Worksheet getXmlSheet(InputStream is, Object sheetId)
+            throws ParserConfigurationException, IOException, SAXException {
         nl.fountain.xelem.excel.Workbook workbook = getXmlWorkbook(is);
         if (sheetId instanceof Integer) {
             Worksheet worksheet = workbook.getWorksheetAt((Integer) sheetId);
@@ -140,7 +145,8 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         throw new ReportPageInstantiationException("Unexpected Excel Sheet identifier type:" + sheetIdType);
     }
 
-    private static nl.fountain.xelem.excel.Workbook getXmlWorkbook(InputStream is) throws Exception {
+    private static nl.fountain.xelem.excel.Workbook getXmlWorkbook(InputStream is)
+            throws ParserConfigurationException, SAXException, IOException {
         ExcelReader reader = new ExcelReader();
         is = skipNewLines(is); // required by ExcelReader
         InputSource source = new InputSource(is);
@@ -169,7 +175,7 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         return doCreate(is, sheetName);
     }
 
-    public ReportPage doCreate(InputStream is, Object sheetId) {
+    protected ReportPage doCreate(InputStream is, Object sheetId) {
         try {
             ByteArrayInputStream bais = convertToByteArrayInputStream(is);
             // try Excel file
@@ -212,15 +218,15 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         }
     }
 
-    @SuppressWarnings("DataFlowIssue")
     private static boolean isEmptyCsvReportPage(CsvReportPage reportPage) {
         if (reportPage.getLastRowNum() == -1) {
             return true;
         }
         // has only one Cell with NULL value
+        @Nullable TableCell cell;
         return reportPage.getLastRowNum() == 0 &&
-                reportPage.getCell(TableCellAddress.of(0, 0)) != null &&
-                reportPage.getRow(0).getCell(0).getValue() == null &&
+                (cell = reportPage.getCell(TableCellAddress.of(0, 0))) != null &&
+                cell.getValue() == null &&
                 reportPage.getCell(TableCellAddress.of(0, 1)) == null &&
                 reportPage.getCell(TableCellAddress.of(1, 0)) == null;
     }
@@ -229,8 +235,8 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         XLS, XLSX, XML, CSV;
 
         static KnownFileExtension valueOf(Path path) {
-            String fileName = path.getFileName().toString();
-            String[] fileNameParts = fileName.split("\\.");
+            Path fileName = requireNonNull(path.getFileName(), () -> "No file name: " + path);
+            String[] fileNameParts = fileName.toString().split("\\.");
             String extension = fileNameParts[fileNameParts.length - 1];
             return valueOf(extension.toUpperCase());
         }

@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
 @SpringBootTest(classes = TableWrapperAutoConfiguration.class)
-public class DefaultContextAwareReportPageFactoryTest {
+class DefaultContextAwareReportPageFactoryTest {
 
     @Autowired
     DefaultContextAwareReportPageFactory factory;
@@ -156,6 +157,20 @@ public class DefaultContextAwareReportPageFactoryTest {
     }
 
     @Test
+    void create_noRegisteredReportPageTypes_exception() throws IOException {
+        List<Class<? extends ReportPage>> registeredTypes = List.copyOf(factory.getRegisteredReportPageTypes());
+        try {
+            factory.getRegisteredReportPageTypes().clear();
+            createCsvFile("file1.any");
+            Object path1 = getPath("file1.any");
+
+            assertThrows(ReportPageInstantiationException.class, () -> factory.create(path1));
+        } finally {
+            factory.getRegisteredReportPageTypes().addAll(registeredTypes);
+        }
+    }
+
+    @Test
     void registerBeanDefinition() {
         int registeredTypes = factory.getRegisteredReportPageTypes().size();
 
@@ -187,8 +202,7 @@ public class DefaultContextAwareReportPageFactoryTest {
         }
 
         @Override
-        @SuppressWarnings("ReturnOfNull")
-        public ReportPageRow getRow(int i) {
+        public @Nullable ReportPageRow getRow(int i) {
             return null;
         }
 

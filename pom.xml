@@ -6,7 +6,7 @@
 
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-spring-boot-starter</artifactId>
-    <version>2025.2</version>
+    <version>2026.1</version>
     <packaging>jar</packaging>
 
     <name>Spring Boot Starter for Table Wrapper</name>
@@ -31,7 +31,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.7.18</spring-boot.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.46</lombok.version>
+        <checkerframework.version>3.55.1</checkerframework.version>  <!-- Checker Framework 4.0.0+ requires Java 17+ -->
     </properties>
 
     <repositories>
@@ -54,7 +55,7 @@
             <dependency>
                 <groupId>com.github.spacious-team</groupId>
                 <artifactId>table-wrapper-api</artifactId>
-                <version>2025.1</version>
+                <version>2026.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -63,17 +64,17 @@
         <dependency>
             <groupId>com.github.spacious-team</groupId>
             <artifactId>table-wrapper-excel-impl</artifactId>
-            <version>2025.1</version>
+            <version>2026.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.spacious-team</groupId>
             <artifactId>table-wrapper-xml-impl</artifactId>
-            <version>2023.1</version>
+            <version>2026.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.spacious-team</groupId>
             <artifactId>table-wrapper-csv-impl</artifactId>
-            <version>2024.1</version>
+            <version>2026.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,15 +95,21 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <version>${checkerframework.version}</version>
+            <scope>provided</scope>  <!-- for static analysis tools only -->
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
+            <version>5.14.4</version>  <!-- junit-jupite 5.x is required for Java 11 -->
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.18.0</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -118,7 +125,7 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version> <!-- JUnit 5 requirement -->
+                    <version>3.5.6</version> <!-- JUnit 5 requirement -->
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -126,12 +133,54 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.15.0</version>
+                <configuration>
+                    <fork>true</fork> <!-- Must fork or else JVM arguments are ignored. -->
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.checkerframework</groupId>
+                            <artifactId>checker</artifactId>
+                            <version>${checkerframework.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <annotationProcessors>
+                        <annotationProcessor>
+                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+                        </annotationProcessor>
+                        <annotationProcessor>
+                            org.checkerframework.checker.nullness.NullnessChecker
+                        </annotationProcessor>
+                    </annotationProcessors>
+                    <compilerArgs combine.children="append">
+                        <!--arg>-Awarns</arg-->
+                        <arg>-AskipDefs=.*Test</arg>
+                        <!-- After updating to Checker Framework 4 replace with
+                        https://github.com/typetools/checker-framework/blob/master/checker/src/main/java/org/checkerframework/checker/nullness/permit-nullness-assertion-exception.astub -->
+                        <arg>-Astubs=${project.basedir}/checkerframework.astub</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                        <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                        <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -151,7 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

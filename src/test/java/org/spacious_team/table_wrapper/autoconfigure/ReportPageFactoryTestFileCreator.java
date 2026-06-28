@@ -40,7 +40,7 @@ import java.util.List;
 
 class ReportPageFactoryTestFileCreator {
     static final Path root = Path.of("target", "test-classes", "test-data");
-    static final String sheetName = "SheetA";
+    static final String SHEET_NAME = "SheetA";
 
     @SneakyThrows
     static void creteFiles() {
@@ -48,6 +48,7 @@ class ReportPageFactoryTestFileCreator {
         createBinFile("test.bin");
         createCsvFile("test.csv");
         createCsvFile("test.txt");
+        createEmptyFile("empty.txt");
         createXmlFile("test.xml");
         try (HSSFWorkbook workbook = new HSSFWorkbook()) {
             createExcelFile("test.xls", workbook);
@@ -91,12 +92,18 @@ class ReportPageFactoryTestFileCreator {
         Files.write(path, lines);
     }
 
+    static void createEmptyFile(@SuppressWarnings("SameParameterValue") String fileName) throws IOException {
+        List<String> lines = List.of("");
+        Path path = getPath(fileName);
+        Files.write(path, lines);
+    }
+
     static void createXmlFile(@SuppressWarnings("SameParameterValue") String fileName) throws XelemException {
         Workbook workbook = new XLWorkbook();
         Path path = getPath(fileName);
         workbook.setFileName(path.toString());
 
-        Worksheet worksheet = workbook.addSheet(sheetName);
+        Worksheet worksheet = workbook.addSheet(SHEET_NAME);
         Row row = worksheet.addRow();
         row.addCell();
         row.addCell().setData("Table 1");
@@ -120,7 +127,7 @@ class ReportPageFactoryTestFileCreator {
         Path path = getPath(fileName);
         try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
 
-            Sheet sheet = workbook.createSheet(sheetName);
+            Sheet sheet = workbook.createSheet(SHEET_NAME);
             org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
             row.createCell(0).setCellValue("Table 1");
             row = sheet.createRow(1);
