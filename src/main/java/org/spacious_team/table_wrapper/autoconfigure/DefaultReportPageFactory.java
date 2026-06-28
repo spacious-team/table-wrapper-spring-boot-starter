@@ -34,7 +34,9 @@ import org.spacious_team.table_wrapper.excel.ExcelSheet;
 import org.spacious_team.table_wrapper.xml.XmlReportPage;
 import org.springframework.util.Assert;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -126,7 +128,8 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         }
     }
 
-    private static Worksheet getXmlSheet(InputStream is, Object sheetId) throws Exception {
+    private static Worksheet getXmlSheet(InputStream is, Object sheetId)
+            throws ParserConfigurationException, IOException, SAXException {
         nl.fountain.xelem.excel.Workbook workbook = getXmlWorkbook(is);
         if (sheetId instanceof Integer) {
             Worksheet worksheet = workbook.getWorksheetAt((Integer) sheetId);
@@ -142,7 +145,8 @@ public class DefaultReportPageFactory implements ReportPageFactory {
         throw new ReportPageInstantiationException("Unexpected Excel Sheet identifier type:" + sheetIdType);
     }
 
-    private static nl.fountain.xelem.excel.Workbook getXmlWorkbook(InputStream is) throws Exception {
+    private static nl.fountain.xelem.excel.Workbook getXmlWorkbook(InputStream is)
+            throws ParserConfigurationException, SAXException, IOException {
         ExcelReader reader = new ExcelReader();
         is = skipNewLines(is); // required by ExcelReader
         InputSource source = new InputSource(is);

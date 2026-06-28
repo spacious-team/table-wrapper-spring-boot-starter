@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
 @SpringBootTest(classes = TableWrapperAutoConfiguration.class)
-public class DefaultContextAwareReportPageFactoryTest {
+class DefaultContextAwareReportPageFactoryTest {
 
     @Autowired
     DefaultContextAwareReportPageFactory factory;

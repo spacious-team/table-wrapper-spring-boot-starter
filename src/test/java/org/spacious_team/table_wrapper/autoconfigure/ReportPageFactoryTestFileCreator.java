@@ -40,7 +40,7 @@ import java.util.List;
 
 class ReportPageFactoryTestFileCreator {
     static final Path root = Path.of("target", "test-classes", "test-data");
-    static final String sheetName = "SheetA";
+    static final String SHEET_NAME = "SheetA";
 
     @SneakyThrows
     static void creteFiles() {
@@ -103,7 +103,7 @@ class ReportPageFactoryTestFileCreator {
         Path path = getPath(fileName);
         workbook.setFileName(path.toString());
 
-        Worksheet worksheet = workbook.addSheet(sheetName);
+        Worksheet worksheet = workbook.addSheet(SHEET_NAME);
         Row row = worksheet.addRow();
         row.addCell();
         row.addCell().setData("Table 1");
@@ -127,7 +127,7 @@ class ReportPageFactoryTestFileCreator {
         Path path = getPath(fileName);
         try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
 
-            Sheet sheet = workbook.createSheet(sheetName);
+            Sheet sheet = workbook.createSheet(SHEET_NAME);
             org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
             row.createCell(0).setCellValue("Table 1");
             row = sheet.createRow(1);

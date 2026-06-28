@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.autoconfigure.ReportPageFactoryTestFileCreator.*;
 
-public class DefaultReportPageFactoryTest {
+class DefaultReportPageFactoryTest {
 
     DefaultReportPageFactory factory = new DefaultReportPageFactory();
 
@@ -54,7 +54,7 @@ public class DefaultReportPageFactoryTest {
         Path path = getPath(fileName);
         assertNotNull(factory.create(path));
         assertNotNull(factory.create(path, 0));
-        assertNotNull(factory.create(path, sheetName));
+        assertNotNull(factory.create(path, SHEET_NAME));
     }
 
     @ParameterizedTest
@@ -66,7 +66,7 @@ public class DefaultReportPageFactoryTest {
         is.reset();
         assertNotNull(factory.create(is, 0));
         is.reset();
-        assertNotNull(factory.create(is, sheetName));
+        assertNotNull(factory.create(is, SHEET_NAME));
     }
 
     @ParameterizedTest
